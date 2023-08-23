@@ -1,24 +1,28 @@
 import "./login.css";
 import { Link } from "react-router-dom";
 import { useRef, useContext } from "react";
-import { loginCall } from "../../apiCalls";
 import { AuthContext } from "../../context/AuthContext";
 import { CircularProgress } from "@material-ui/core";
+import axios from "axios";
 
 export default function Login() {
-
   const email = useRef();
   const password = useRef();
   const { user, isFetching, error, dispatch } = useContext(AuthContext);
 
-
-  const handleClick = (e) => {
-
+  const handleClick = async (e) => {
     e.preventDefault();
-    loginCall({ email: email.current.value, password: password.current.value }, dispatch);
-
-  }
-  console.log(user);
+    dispatch({ type: "LOGIN_START" });
+    try {
+      const res = await axios.post("http://localhost:8000/api/auth/login", {
+        email: email.current.value,
+        password: password.current.value,
+      });
+      dispatch({ type: "LOGIN_SUCCESS", payload: res.data });
+    } catch (err) {
+      dispatch({ type: "LOGIN_FAILURE" });
+    }
+  };
   // console.log(user);
 
   return (
@@ -32,7 +36,6 @@ export default function Login() {
         </div>
         <div className="loginRight">
           <form className="loginBox" onSubmit={handleClick}>
-
             <input
               placeholder="Email"
               // type="email"
@@ -40,7 +43,6 @@ export default function Login() {
               required
               ref={email}
             />
-
 
             <input
               placeholder="Password"
@@ -51,14 +53,21 @@ export default function Login() {
               ref={password}
             />
 
-
             <button className="loginButton" disabled={isFetching}>
-                {isFetching ? <CircularProgress style={{ "color": "white" }} size="24px" /> : "Log In"}
+              {isFetching ? (
+                <CircularProgress style={{ color: "white" }} size="24px" />
+              ) : (
+                "Log In"
+              )}
             </button>
             <span className="loginForgot">Forgot Password?</span>
-            <Link to="/register" style={{ "textAlign": "center" }}>
+            <Link to="/register" style={{ textAlign: "center" }}>
               <button className="loginRegisterButton" disabled={isFetching}>
-                  {isFetching ? <CircularProgress style={{ "color": "white" }} size="24px" /> : "Create an Account"}
+                {isFetching ? (
+                  <CircularProgress style={{ color: "white" }} size="24px" />
+                ) : (
+                  "Create an Account"
+                )}
               </button>
             </Link>
           </form>

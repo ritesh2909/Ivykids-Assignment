@@ -8,22 +8,23 @@ import { AuthContext } from "../../context/AuthContext";
 import { useContext } from "react";
 import { Add, Remove } from "@material-ui/icons";
 export default function Rightbar({ user }) {
-
-
   const PF = "http://localhost:8000/images/";
 
   const [friends, setFriends] = useState([]);
   const { user: currentUser, dispatch } = useContext(AuthContext);
-  const [followed, setFollowed] = useState(
-    currentUser.following.includes(user)
-  );
 
-  
-  
+  const [followed, setFollowed] = useState({});
+
+  // if (currentUser?.following.includes(user)) {
+  //   setFollowed(currentUser.following.user);
+  // }
+
   useEffect(() => {
     const getFriends = async () => {
       try {
-        const friendList = await axios.get("http://localhost:8000/api/users/friends/" + user._id);
+        const friendList = await axios.get(
+          "http://localhost:8000/api/users/friends/" + user._id
+        );
         setFriends(friendList.data);
       } catch (err) {
         console.log(err);
@@ -35,13 +36,14 @@ export default function Rightbar({ user }) {
   const handleClick = async () => {
     try {
       if (followed) {
-        await axios.put(`http://localhost:8000/api/users/unfollow/${user._id}`, {
-          userId: currentUser._id.$oid,
-        });
+        await axios.put(
+          `http://localhost:8000/api/users/unfollow/${user._id}`,
+          {
+            userId: currentUser._id.$oid,
+          }
+        );
         dispatch({ type: "UNFOLLOW", payload: user._id });
-      } 
-      else
-      {
+      } else {
         console.log(user._id);
         await axios.put(`http://localhost:8000/api/users/follow/${user._id}`, {
           userId: currentUser._id.$oid,
@@ -49,8 +51,7 @@ export default function Rightbar({ user }) {
         dispatch({ type: "FOLLOW", payload: user._id });
       }
       setFollowed(!followed);
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const HomeRightbar = () => {
@@ -110,7 +111,7 @@ export default function Rightbar({ user }) {
               to={"/profile/" + friend.username}
               style={{ textDecoration: "none" }}
             >
-              <div className="rightbarFollowing">
+              <div className="rightbarFollowing" key={friend._id}>
                 <img
                   src={
                     friend.profilePicture

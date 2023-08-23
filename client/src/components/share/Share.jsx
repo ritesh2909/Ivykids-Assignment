@@ -16,7 +16,7 @@ export default function Share() {
   const submitHandler = async (e) => {
     e.preventDefault();
     const newPost = {
-      userId: user._id.$oid,
+      userId: user._id,
       description: description.current.value,
     };
     if (file) {
@@ -40,7 +40,6 @@ export default function Share() {
       console.log(err);
     }
   };
-
 
 
   return (
